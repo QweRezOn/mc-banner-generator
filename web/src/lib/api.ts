@@ -1,6 +1,6 @@
 import zod from "zod"
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
+const apiBaseUrl = "/api"
 
 const minecraftPattern = zod.object({
     pattern: zod.string(),
