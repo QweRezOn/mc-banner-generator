@@ -68,6 +68,8 @@
         if (timeout) clearTimeout(timeout)
         timeout = setTimeout(() => {
             const searchParams = new URLSearchParams(document.location.search)
+            if ((baseColor === Color.White && !patterns.length) && !searchParams.has("banner")) return
+
             searchParams.set("banner", changedUrl)
 
             const newUrl = [
