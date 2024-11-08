@@ -4,6 +4,8 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
+ENV VITE_API_BASE_URL="/api"
+
 WORKDIR /app/web
 
 COPY ./web/package.json ./web/pnpm-lock.yaml* ./

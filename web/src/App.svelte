@@ -4,7 +4,7 @@
     import { type BannerPattern, Color, type ColorKey, Pattern, type PatternKey } from "$lib/banner"
     import { Button } from "$lib/components/ui/button"
     import { PlusIcon } from "lucide-svelte"
-    import { type DndEvent, dndzone } from "svelte-dnd-action"
+    import { type DndEvent, dragHandleZone } from "svelte-dnd-action"
     import { onMount } from "svelte"
     import { snakeToPascalCase } from "$lib/utils"
     import { getBannerMeta } from "$lib/api"
@@ -12,6 +12,7 @@
     import { Toaster } from "$lib/components/ui/sonner"
     import BannerCanvas from "./components/BannerCanvas.svelte"
     import { preloadPatterns } from "$lib/banner-render"
+    import { flip } from "svelte/animate"
 
     let baseColor = $state(Color.White)
     let patterns: BannerPattern[] = $state([])
@@ -128,23 +129,25 @@
                 <Button variant="destructive" class="w-full" onclick={clear}>Clear</Button>
             </div>
             <div class="flex flex-col gap-4 w-64 max-md:w-full">
-                <PatternElement pattern={Pattern.Base} bind:color={baseColor} disabled />
+                <PatternElement pattern={Pattern.Base} bind:patternColor={baseColor} disabled />
 
                 {#if patterns.length > 0}
                     <div
                         class="flex flex-col w-full gap-4 !outline-none"
-                        use:dndzone="{{ items: patterns }}"
+                        use:dragHandleZone="{{ items: patterns, flipDurationMs: 100, zoneItemTabIndex: -1 }}"
                         onconsider="{handleSort}"
                         onfinalize="{handleSort}"
                     >
                         {#each patterns as pattern(pattern.id)}
-                            <PatternElement
-                                bind:pattern={pattern.pattern}
-                                bind:color={pattern.color}
-                                patternHidden={pattern.hidden}
-                                onVisibilityChange={hidden => pattern.hidden = hidden}
-                                onRemove={() => removePattern(pattern.id)}
-                            />
+                            <div animate:flip={{ duration: 100 }} class="!outline-none">
+                                <PatternElement
+                                    bind:pattern={pattern.pattern}
+                                    bind:patternColor={pattern.color}
+                                    patternHidden={pattern.hidden}
+                                    onVisibilityChange={hidden => pattern.hidden = hidden}
+                                    onRemove={() => removePattern(pattern.id)}
+                                />
+                            </div>
                         {/each}
                     </div>
                 {/if}

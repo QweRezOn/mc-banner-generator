@@ -1,27 +1,33 @@
 <script lang="ts">
     import * as Popover from "$lib/components/ui/popover"
-    import { Color, getHexColor, Pattern, type PatternKey } from "$lib/banner"
+    import { Color, type ColorKey, getHexColor, Pattern, type PatternKey } from "$lib/banner"
     import { EyeClosedIcon, EyeIcon, GripVerticalIcon, TrashIcon } from "lucide-svelte"
     import { cn } from "$lib/utils"
     import PatternCanvas from "./PatternCanvas.svelte"
     import { Button } from "$lib/components/ui/button"
+    import type { SvelteHTMLElements } from "svelte/elements"
+    import { dragHandle } from "svelte-dnd-action"
 
-    interface Props {
-        color: Color,
+    type Props = {
+        patternColor: Color,
         pattern: Pattern,
         patternHidden?: boolean,
         disabled?: boolean,
+        // eslint-disable-next-line no-unused-vars
         onVisibilityChange?: (hidden: boolean) => void,
         onRemove?: () => void,
-    }
+    } & SvelteHTMLElements["div"]
+
+    type $$Props = Props
 
     let {
         disabled,
-        color = $bindable(),
+        patternColor = $bindable(),
         pattern = $bindable(),
         patternHidden,
         onVisibilityChange,
         onRemove,
+        ...rest
     }: Props = $props()
 
     let oldColor: Color | undefined = $state()
@@ -31,10 +37,6 @@
 
     let patternOpen = $state(false)
 
-    const getPatternString = (pattern: Pattern) => {
-        return Pattern[pattern].split(/\.?(?=[A-Z])/).join("_").toLowerCase()
-    }
-
     const patterns = Object.keys(Pattern)
         .filter(key => isNaN(Number(key)))
         .map(key => Pattern[key as PatternKey])
@@ -42,9 +44,10 @@
 
     const colors = Object.keys(Color)
         .filter(key => isNaN(Number(key)))
+        .map(key => key as ColorKey)
 
     const setColor = (newColor: Color) => {
-        color = newColor
+        patternColor = newColor
         oldColor = undefined
         colorOpen = false
     }
@@ -68,23 +71,28 @@
         colorOpen = state
 
         if (oldColor !== undefined) {
-            color = oldColor
+            patternColor = oldColor
             oldColor = undefined
         }
     }
 </script>
 
-<div class={cn("flex gap-2 items-center w-full p-4 bg-background border border-accent rounded-lg", disabled && "pl-12")}>
+<div
+    class={cn("flex gap-2 items-center w-full p-4 bg-background border border-accent rounded-lg", disabled && "pl-12")}
+    {...rest}
+>
     {#if !disabled}
-        <GripVerticalIcon class="text-accent-foreground cursor-grab" />
+        <div use:dragHandle class="outline-none">
+            <GripVerticalIcon class="text-accent-foreground" />
+        </div>
     {/if}
 
     <Popover.Root open={patternOpen} onOpenChange={onPatternOpenChange}>
         {#if disabled}
-            <PatternCanvas pattern={pattern} patternColor={color} />
+            <PatternCanvas pattern={pattern} patternColor={patternColor} />
         {:else}
             <Popover.Trigger>
-                <PatternCanvas pattern={pattern} patternColor={color} />
+                <PatternCanvas pattern={pattern} patternColor={patternColor} />
             </Popover.Trigger>
         {/if}
         <Popover.Content class="flex flex-wrap gap-2">
@@ -99,7 +107,7 @@
                 >
                     <PatternCanvas
                         pattern={patternKey}
-                        patternColor={color}
+                        patternColor={patternColor}
                         class="w-5 h-auto hover:outline hover:outline-zinc-500 bg-accent"
                     />
                 </button>
@@ -110,7 +118,7 @@
     <Popover.Root open={colorOpen} onOpenChange={onColorOpenChange}>
         <Popover.Trigger>
             <div
-                style="background-color: #{getHexColor(color).toString(16)}"
+                style="background-color: #{getHexColor(patternColor).toString(16)}"
                 class="size-4 rounded"
             ></div>
         </Popover.Trigger>
@@ -121,8 +129,8 @@
                     class="size-4 rounded cursor-pointer hover:outline hover:outline-zinc-500"
                     onclick={() => setColor(Color[colorKey])}
                     onmouseenter={() => {
-                        if (oldColor === undefined) oldColor = color
-                        color = Color[colorKey]
+                        if (oldColor === undefined) oldColor = patternColor
+                        patternColor = Color[colorKey]
                     }}
                     aria-label="Color {colorKey}"
                 ></button>
