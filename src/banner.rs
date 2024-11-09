@@ -151,6 +151,8 @@ pub struct Banner {
 enum ParseError {
     #[error("string can't be empty")]
     Empty,
+    #[error("invalid banner string")]
+    InvalidBannerString,
     #[error("invalid color {0}")]
     InvalidColor(String),
     #[error("invalid pattern {0}")]
@@ -163,6 +165,10 @@ impl Banner {
             bail!(ParseError::Empty)
         }
 
+        if !banner_string.is_ascii() {
+            bail!(ParseError::InvalidBannerString)
+        }
+        
         let banner_color = Color::parse_color(&banner_string[0..1])?;
         let mut banner_patterns: Vec<BannerPattern> = Vec::new();
 
