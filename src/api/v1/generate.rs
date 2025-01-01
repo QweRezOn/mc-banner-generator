@@ -7,11 +7,18 @@ use axum::response::Response;
 use image::RgbaImage;
 use std::io::Cursor;
 
+const CACHE_TIME: i32 = 30 * 24 * 60 * 60;
+
 pub async fn generate(
     State(app_state): State<AppState>,
     Path(banner_string): Path<String>,
 ) -> Result<Response, AppError> {
-    let banner = Banner::parse_banner(&banner_string)?;
+    let banner_without_extension = banner_string
+        .chars()
+        .take_while(|&ch| ch != '.')
+        .collect::<String>();
+
+    let banner = Banner::parse_banner(&banner_without_extension)?;
 
     let mut image = RgbaImage::new(20, 40);
     let base_pattern_image = &app_state.patterns[Pattern::Base];
@@ -30,9 +37,8 @@ pub async fn generate(
     let mut cursor = Cursor::new(&mut buf);
     image.write_to(&mut cursor, image::ImageFormat::Png)?;
 
-    Ok(
-        Response::builder()
-            .header(header::CONTENT_TYPE, "image/png")
-            .body(buf.into())?
-    )
+    Ok(Response::builder()
+        .header(header::CONTENT_TYPE, "image/png")
+        .header(header::CACHE_CONTROL, format!("public, max-age={}", CACHE_TIME))
+        .body(buf.into())?)
 }
