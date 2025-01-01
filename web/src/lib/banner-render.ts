@@ -21,7 +21,7 @@ export const getPatternImage = (pattern: Pattern): Promise<HTMLImageElement> => 
             patternImage = new Image()
             patternImages.set(pattern, patternImage)
             patternImage.crossOrigin = "anonymous"
-            patternImage.src = apiUrl(`/v1/pattern/${getPatternString(pattern)}`)
+            patternImage.src = apiUrl(`/v1/pattern/${getPatternString(pattern)}.png`)
         }
 
         if (patternImage.complete) {
