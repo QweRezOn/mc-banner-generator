@@ -50,17 +50,17 @@
 
         baseColor = color
         patterns = newPatterns
-        toast.success("Command imported")
+        toast.success("Команда импортирована")
     }
 
     const onCopy = () => {
         navigator.clipboard.writeText(commandValue)
-        toast.success("Copied to clipboard")
+        toast.success("Скопировано в буфер обмена")
     }
 
     const onCopyLink = () => {
         navigator.clipboard.writeText(document.location.href)
-        toast.success("Copied to clipboard")
+        toast.success("Скопировано в буфер обмена")
     }
 
     $effect(() => {
@@ -82,20 +82,20 @@
 
 <Tabs.Root value={currentTab} onValueChange={onTabChange} class="flex flex-col flex-1 gap-2 w-full">
     <Tabs.List class="w-full">
-        <Tabs.Trigger value="banner" class="w-full">Banner</Tabs.Trigger>
-        <Tabs.Trigger value="shield" class="w-full">Shield</Tabs.Trigger>
+        <Tabs.Trigger value="banner" class="w-full">Баннер</Tabs.Trigger>
+        <Tabs.Trigger value="shield" class="w-full">Щит</Tabs.Trigger>
     </Tabs.List>
 
     <div class="flex flex-col gap-2">
         <Textarea bind:value={commandValue} class="min-h-24"></Textarea>
         <Button variant="outline" onclick={onCopy}>
-            Copy command
+            Скопировать команду
         </Button>
         <Button variant="outline" onclick={onImport}>
-            Import command
+            Импортировать команду
         </Button>
         <Button variant="outline" onclick={onCopyLink}>
-            Copy link
+            Скопировать ссылку
         </Button>
     </div>
 </Tabs.Root>
