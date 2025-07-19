@@ -120,7 +120,7 @@
 <Toaster position="top-center" />
 
 <main class="flex flex-col gap-8 md:container rendering-pixelated py-8 px-8 xl:px-64 md:py-16 max-md:text-center">
-    <h1 class="text-4xl text-accent-foreground font-semibold">Banner Generator</h1>
+    <h1 class="text-4xl text-accent-foreground font-semibold">Генератор баннеров</h1>
 
     {#if !loading}
         <div class="flex max-md:flex-col max-md:items-center gap-8">
